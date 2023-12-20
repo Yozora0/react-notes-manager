@@ -12,6 +12,11 @@
     border-color: #fd610d;
 }
 
+.button:active {
+    background-color: #e15000;
+    border-color: #e15000;
+}
+
 
 .button:focus {
     box-shadow: 0 0 0 0.25rem rgba(255, 128, 62, 0.5);

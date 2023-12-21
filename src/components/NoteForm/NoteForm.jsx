@@ -1,14 +1,43 @@
 import s from "./style.module.css";
-import { PencilFill, Trash, TrashFill } from "react-bootstrap-icons";
+import { PencilFill, TrashFill } from "react-bootstrap-icons";
 import { ButtonPrimary } from "components/ButtonPrimary/ButtonPrimary";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ValidatorService } from "services/form-validators";
+import { FieldError } from "components/FieldError/FieldError";
+
+const VALIDATORS = {
+    title: (value) => {
+        return ValidatorService.min(value, 3) || ValidatorService.max(value, 20);
+    },
+    content: (value) => {
+        return ValidatorService.min(value, 3);
+    },
+};
+
 export function NoteForm({ title, onClickEdit, onClickTrash, onSubmit }) {
     const [formValues, setFormValues] = useState({ title: "", content: "" });
+    const [formErrors, setFormErrors] = useState({
+        title: "",
+        content: "",
+    });
 
+    function hasError() {
+        return Object.values(formErrors).some((error) => error !== undefined);
+    }
     function updateFormValues(e) {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });
+        validate(e.target.name, e.target.value);
     }
 
+    function validate(fieldName, fieldValue, done) {
+        setFormErrors(
+            {
+                ...formErrors,
+                [fieldName]: VALIDATORS[fieldName](fieldValue),
+            },
+            done
+        );
+    }
     const actionIcons = (
         <>
             <div className="col-1">
@@ -23,7 +52,7 @@ export function NoteForm({ title, onClickEdit, onClickTrash, onSubmit }) {
     );
 
     const titleInput = (
-        <>
+        <div className="mb-5">
             <label className="form-label">Title</label>
             <input
                 onChange={updateFormValues}
@@ -31,11 +60,12 @@ export function NoteForm({ title, onClickEdit, onClickTrash, onSubmit }) {
                 name="title"
                 className="form-control"
             />
-        </>
+            <FieldError msg={formErrors.title} />
+        </div>
     );
 
     const contentInput = (
-        <>
+        <div className="mb-5">
             <label className="form-label">Content</label>
             <textarea
                 onChange={updateFormValues}
@@ -44,12 +74,18 @@ export function NoteForm({ title, onClickEdit, onClickTrash, onSubmit }) {
                 className="form-control"
                 row="5"
             />
-        </>
+            <FieldError msg={formErrors.content} />
+        </div>
     );
 
     const submitButton = (
         <div className={s.submit_btn}>
-            <ButtonPrimary onClick={() => onSubmit(formValues)}>Submit</ButtonPrimary>
+            <ButtonPrimary
+                isDisabled={hasError()}
+                onClick={() => onSubmit(formValues)}
+            >
+                Submit
+            </ButtonPrimary>
         </div>
     );
 

@@ -20,9 +20,9 @@ export function App() {
   return (
       <div className="container-fluid">
         <Header />
-          <div className={s.outlet_container}>
-            <Outlet />
-          </div>
+        <div className={s.outlet_container}>
+          <Outlet />
+        </div>
       </div>
   );
 }
